@@ -1,5 +1,6 @@
 include:
   - resolver
+  - router.kea
   - router.shorewall
 
 router-packages:
@@ -9,8 +10,6 @@ router-packages:
       - gnupg
       - htop
       - iftop
-      - kea-admin
-      - kea-dhcp4-server
       - lsof
       - tcpdump
       - vim-tiny
