@@ -12,7 +12,7 @@ router-packages:
       - iftop
       - lsof
       - tcpdump
-      - vim-tiny
+      - vim-nox
 
 wan-interface:
   network.managed:
