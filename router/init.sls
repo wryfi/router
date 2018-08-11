@@ -1,11 +1,13 @@
 include:
   - resolver
+  - router.dyndns
   - router.kea
   - router.shorewall
 
 router-packages:
   pkg.latest:
     - pkgs:
+      - curl
       - dnsutils
       - gnupg
       - htop
