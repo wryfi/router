@@ -3,25 +3,46 @@ include:
   - router.dyndns
   - router.kea
   - router.shorewall
+  - router.eap
 
 router-packages:
   pkg.latest:
     - pkgs:
       - curl
       - dnsutils
+      - ethtool
       - gnupg
       - htop
       - iftop
       - lsof
       - tcpdump
       - vim-nox
+      - vlan
 
 wan-interface:
   network.managed:
     - name: enp1s0
     - enabled: True
     - type: eth
+    - proto: manual
+    - hwaddress: 2c:95:69:58:4e:c1
+
+wan-vlan-interface:
+  network.managed:
+    - name: enp1s0.0
+    - enabled: true
+    - type: vlan
     - proto: dhcp
+    - vlan-raw-device: enp1s0
+    - require:
+      - network: wan-interface
+
+router-interface:
+  network.managed:
+    - name: enp2s0
+    - enabled: True
+    - type: eth
+    - proto: manual
 
 lan-interface:
   network.managed:

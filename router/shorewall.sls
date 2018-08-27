@@ -8,7 +8,7 @@ shorewall-params:
   file.managed:
     - name: /etc/shorewall/params
     - contents: |
-        WAN_IF=enp1s0
+        WAN_IF=enp1s0.0
         LAN_IF=enp4s0
         INTERNAL=10.9.8.0/24
 
