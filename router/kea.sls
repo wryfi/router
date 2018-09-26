@@ -4,11 +4,6 @@ kea-packages:
       - kea-admin
       - kea-dhcp4-server
 
-# kea-dhcp4-config:
-#   file.managed:
-#     - name: /etc/kea/kea-dhcp4.conf
-#     - source: salt://router/files/etc/kea/kea-dhcp4.conf
-
 kea-dhcp4-config:
   file.serialize:
     - name: /etc/kea/kea-dhcp4.conf
