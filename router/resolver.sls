@@ -53,6 +53,7 @@ unbound-refuse-run:
   cmd.run:
     - name: "python3 /usr/local/bin/unbound_refuse.py"
     - unless: "[[ -f /etc/unbound/unbound.conf.d/blacklist.conf ]]"
+    - reset_system_locale: false
     - require:
       - service: unbound-service
 
