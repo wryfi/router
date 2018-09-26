@@ -34,6 +34,30 @@ unbound-config:
           root-hints: "/etc/unbound/root.hints"
           local-zone: "10.in-addr.arpa" nodefault
 
+{%- if salt.pillar.get('unbound:refuse') %}
+
+unbound_refuse-install:
+  file.managed:
+    - name: /usr/local/bin/unbound_refuse.py
+    - source: https://raw.githubusercontent.com/wryfi/unbound-refuse/master/unbound_refuse.py
+    - skip_verify: true
+    - mode: 0755
+
+unbound_refuse-cron:
+  file.managed:
+    - name: refuse
+    - contents: |
+        0 0 * * *    root    /usr/local/bin/unbound_refuse.py
+
+unbound-refuse-run:
+  cmd.run:
+    - name: /usr/local/bin/unbound_refuse.py
+    - unless: "[[ -f /etc/unbound/unbound.conf.do/blacklist.conf ]]"
+    - require:
+      - service: unbound-service
+
+{%- endif %}
+
 unbound-service:
   service.running:
     - name: unbound
