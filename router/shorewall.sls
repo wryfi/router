@@ -8,9 +8,9 @@ shorewall-params:
   file.managed:
     - name: /etc/shorewall/params
     - contents: |
-        WAN_IF=enp1s0.0
-        LAN_IF=enp4s0
-        INTERNAL=10.9.8.0/24
+        WAN_IF={{ salt.pillar.get('wan:vlan_interface') }}
+        LAN_IF={{ salt.pillar.get('lan:interface') }}
+        INTERNAL={{ salt.pillar.get('lan:network') }}/{{ salt.pillar.get('lan:cidr') }}
 
 shorewall-zones:
   file.managed:

@@ -1,9 +1,10 @@
 include:
-  - resolver
+  - router.resolver
   - router.dyndns
   - router.kea
   - router.shorewall
   - router.eap
+  - router.ntp
 
 router-packages:
   pkg.latest:
@@ -21,37 +22,37 @@ router-packages:
 
 wan-interface:
   network.managed:
-    - name: enp1s0
+    - name: {{ salt.pillar.get('wan:interface') }}
     - enabled: True
     - type: eth
     - proto: manual
-    - hwaddress: 2c:95:69:58:4e:c1
+    - hwaddress: {{ salt.pillar.get('wan:mac') }}
 
 wan-vlan-interface:
   network.managed:
-    - name: enp1s0.0
+    - name: {{ salt.pillar.get('wan:vlan_interface') }}
     - enabled: true
     - type: vlan
     - proto: dhcp
-    - vlan-raw-device: enp1s0
+    - vlan-raw-device: {{ salt.pillar.get('wan:interface') }}
     - require:
       - network: wan-interface
 
 router-interface:
   network.managed:
-    - name: enp2s0
+    - name: {{ salt.pillar.get('shitbox:interface') }}
     - enabled: True
     - type: eth
     - proto: manual
 
 lan-interface:
   network.managed:
-    - name: enp4s0
+    - name: {{ salt.pillar.get('lan:interface') }}
     - enabled: True
     - type: eth
     - proto: none
-    - ipaddr: 10.9.8.1
-    - netmask: 255.255.255.0
+    - ipaddr: {{ salt.pillar.get('lan:ip') }}
+    - netmask: {{ salt.pillar.get('lan:netmask') }}
 
 vm-swappiness:
   sysctl.present:
@@ -67,11 +68,11 @@ ip-forward-enable:
 resolvconf:
   file.managed:
     - name: /etc/resolv.conf
-    - contents:
-      - domain isla.xyz.wry.fi.
-      - search isla.xyz.wry.fi.
-      - nameserver 10.9.8.1
-      - nameserver 8.8.8.8
+    - source: salt://router/files/etc/resolv.conf
+    - template: jinja
+    - defaults:
+        search: {{ salt.pillar.get('resolvconf:search') }}
+        nameservers: {{ salt.pillar.get('resolvconf:nameservers') }}
 
 dhclient-config:
   file.managed:

@@ -1,3 +1,5 @@
+{% import_yaml 'router/config.yml' as config %}
+
 install-eap-deps:
   pkg.installed:
     - pkgs:
@@ -16,8 +18,8 @@ eap-proxy-config:
     - source: salt://router/files/etc/eap_proxy.conf
     - template: jinja
     - defaults:
-        IF_WAN: enp1s0
-        IF_ROUTER: enp2s0
+        IF_WAN: {{ salt.pillar.get('wan:interface') }}
+        IF_ROUTER: {{ salt.pillar.get('shitbox:interface') }}
 
 eap-proxy-service:
   service.running:

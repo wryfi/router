@@ -1,3 +1,5 @@
+{% import_yaml 'router/config.yml' as config %}
+
 resolver-packages:
   pkg.latest:
     - pkgs:
@@ -25,8 +27,8 @@ unbound-config:
     - name: /etc/unbound/unbound.conf.d/router.conf
     - contents: |
         server:
-          interface: 10.9.8.1
-          access-control: 10.9.8.0/24 allow
+          interface: {{ salt.pillar.get('lan:ip') }}
+          access-control: {{ salt.pillar.get('lan:network') }}/{{ salt.pillar.get('lan:cidr') }} allow
           num-threads: 5
           do-ip6: no
           root-hints: "/etc/unbound/root.hints"
