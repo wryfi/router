@@ -45,14 +45,14 @@ unbound_refuse-install:
 
 unbound_refuse-cron:
   file.managed:
-    - name: refuse
+    - name: /etc/cron.d/refuse
     - contents: |
         0 0 * * *    root    /usr/local/bin/unbound_refuse.py
 
 unbound-refuse-run:
   cmd.run:
-    - name: /usr/local/bin/unbound_refuse.py
-    - unless: "[[ -f /etc/unbound/unbound.conf.do/blacklist.conf ]]"
+    - name: "python3 /usr/local/bin/unbound_refuse.py"
+    - unless: "[[ -f /etc/unbound/unbound.conf.d/blacklist.conf ]]"
     - require:
       - service: unbound-service
 
