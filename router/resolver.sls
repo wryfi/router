@@ -1,5 +1,3 @@
-{% import_yaml 'router/config.yml' as config %}
-
 resolver-packages:
   pkg.latest:
     - pkgs:
