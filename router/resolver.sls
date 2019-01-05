@@ -41,19 +41,28 @@ unbound_refuse-install:
     - skip_verify: true
     - mode: 0755
 
+unbound-refuse-whitelist:
+  file.managed:
+    - name: /etc/unbound/refuse.d/whitelist
+    - source: salt://router/files/etc/unbound/refuse.d/whitelist
+    - makedirs: true
+
 unbound_refuse-cron:
   file.managed:
     - name: /etc/cron.d/refuse
+    - require:
+      - file: unbound-refuse-whitelist
     - contents: |
-        0 0 * * *    root    /usr/local/bin/unbound_refuse.py
+        0 0 * * *    root    /usr/local/bin/unbound_refuse.py -W /etc/unbound/refuse.d/whitelist
 
 unbound-refuse-run:
   cmd.run:
-    - name: "python3 /usr/local/bin/unbound_refuse.py"
+    - name: "python3 /usr/local/bin/unbound_refuse.py -W /etc/unbound/refuse.d/whitelist"
     - unless: "[[ -f /etc/unbound/unbound.conf.d/blacklist.conf ]]"
     - reset_system_locale: false
     - require:
       - service: unbound-service
+      - file: unbound-refuse-whitelist
 
 {%- endif %}
 
