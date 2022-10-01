@@ -4,6 +4,11 @@ shorewall-packages:
       - shorewall
       - shorewall-doc
 
+shorewall-config:
+  file.managed:
+    - name: /etc/shorewall/shorewall.conf
+    - source: salt://router/files/etc/shorewall/shorewall.conf
+
 shorewall-params:
   file.managed:
     - name: /etc/shorewall/params
@@ -19,6 +24,7 @@ shorewall-zones:
         fw firewall
         wan ipv4
         lan ipv4
+        dock ipv4
 
 shorewall-interfaces:
   file.managed:
@@ -27,6 +33,7 @@ shorewall-interfaces:
         ?FORMAT 2
         wan  $WAN_IF  logmartians=1,routefilter=2,nosmurfs
         lan  $LAN_IF
+        dock docker0 bridge
 
 shorewall-policy:
   file.managed:
@@ -36,6 +43,7 @@ shorewall-policy:
         $FW     lan    ACCEPT
         lan     $FW    ACCEPT
         lan     wan    ACCEPT
+        dock    all    ACCEPT
         wan     all    DROP      info
         all     all    REJECT    info
 
@@ -59,6 +67,8 @@ shorewall-rules:
         ACCEPT          $FW             wan             icmp
 
         # Permit incoming ssh
+        ACCEPT          lan             $FW             tcp     80
+        ACCEPT          lan             $FW             tcp     443
         ACCEPT          wan             $FW             tcp     2222
 
 shorewall-snat:

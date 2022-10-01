@@ -1,79 +1,45 @@
-resolver-packages:
-  pkg.latest:
-    - pkgs:
-      - unbound
-
-root-hints-cron:
-  file.managed:
-    - name: /etc/cron.d/hints
-    - contents:
-      - 13 3 * * *  root  [ -d /etc/unbound ] && /usr/bin/wget -q "https://www.internic.net/domain/named.cache" -O /etc/unbound/root.hints
-
-disable-dnssec:
-  file.absent:
-    - name: /etc/unbound/unbound.conf.d/root-auto-trust-anchor-file.conf
+remove-unbound:
+  pkg.removed:
+    - name: unbound
     - require:
-      - pkg: resolver-packages
+      - service: unbound-disable
 
-create-root-hints:
-  cmd.run:
-    - name: wget -q "https://www.internic.net/domain/named.cache" -O /etc/unbound/root.hints
-    - unless: "[ -f /etc/unbound/root.hints ]"
+unbound-disable:
+  service.dead:
+    - name: unbound
+    - enable: false
 
-unbound-config:
-  file.managed:
-    - name: /etc/unbound/unbound.conf.d/router.conf
-    - contents: |
-        server:
-          interface: {{ salt.pillar.get('lan:ip') }}
-          access-control: {{ salt.pillar.get('lan:network') }}/{{ salt.pillar.get('lan:cidr') }} allow
-          num-threads: 5
-          do-ip6: no
-          root-hints: "/etc/unbound/root.hints"
-          local-zone: "10.in-addr.arpa" nodefault
-
-{%- if salt.pillar.get('unbound:refuse') %}
-
-unbound_refuse-install:
-  file.managed:
-    - name: /usr/local/bin/unbound_refuse.py
-    - source: https://raw.githubusercontent.com/wryfi/unbound-refuse/master/unbound_refuse.py
-    - skip_verify: true
+pihole-volume:
+  file.directory:
+    - name: /opt/pihole/etc/pihole
     - mode: 0755
 
-unbound-refuse-whitelist:
-  file.managed:
-    - name: /etc/unbound/refuse.d/whitelist
-    - source: salt://router/files/etc/unbound/refuse.d/whitelist
-    - makedirs: true
+dnsmasq-volume:
+  file.directory:
+    - name: /opt/pihole/etc/dnsmasq.d
+    - mode: 0755
 
-unbound_refuse-cron:
-  file.managed:
-    - name: /etc/cron.d/refuse
-    - require:
-      - file: unbound-refuse-whitelist
-    - contents: |
-        0 0 * * *    root    /usr/local/bin/unbound_refuse.py -W /etc/unbound/refuse.d/whitelist
+pihole-network:
+  docker_network.present:
+    - name: pihole-network
 
-unbound-refuse-run:
-  cmd.run:
-    - name: "python3 /usr/local/bin/unbound_refuse.py -W /etc/unbound/refuse.d/whitelist"
-    - unless: "[[ -f /etc/unbound/unbound.conf.d/blacklist.conf ]]"
-    - reset_system_locale: false
-    - require:
-      - service: unbound-service
-      - file: unbound-refuse-whitelist
+pihole-container:
+  docker_container.running:
+    - name: pihole
+    - image: pihole/pihole:latest
+    - dns: 8.8.8.8
+    - binds:
+      - /opt/pihole/etc/pihole:/etc/pihole
+      - /opt/pihole/etc/dnsmasq.d:/etc/dnsmasq.d
+    - environment:
+      - TZ: America/Los_Angeles
+      - ServerIP: 10.9.8.1
+    - port_bindings:
+      - 10.9.8.1:53:53/tcp
+      - 10.9.8.1:53:53/udp
+      - 10.9.8.1:80:80/tcp
+      - 10.9.8.1:443:443/tcp
+    - restart_policy: always
+    - cap_add:
+      - NET_ADMIN
 
-{%- endif %}
-
-unbound-service:
-  service.running:
-    - name: unbound
-    - enable: true
-    - require: 
-      - pkg: resolver-packages
-      - cmd: create-root-hints
-      - file: disable-dnssec
-      - file: root-hints-cron
-    - watch:
-      - file: unbound-config
