@@ -1,4 +1,5 @@
 include:
+  - router.docker
   - router.resolver
   - router.dyndns
   - router.kea
@@ -6,19 +7,33 @@ include:
   - router.eap
   - router.ntp
 
+backports-repo:
+  pkgrepo.managed:
+    - name: deb http://deb.debian.org/debian buster-backports main
+    - file: /etc/apt/sources.list.d/backports.list
+
 router-packages:
   pkg.latest:
     - pkgs:
+      - apt-transport-https
+      - ca-certificates
       - curl
       - dnsutils
       - ethtool
       - gnupg
+      - gnupg-agent
       - htop
       - iftop
       - lsof
+      - python3-docker
+      - software-properties-common
       - tcpdump
       - vim-nox
       - vlan
+    - require:
+      - pkgrepo: backports-repo
+    - refresh: true
+    
 
 wan-interface:
   network.managed:
