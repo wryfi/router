@@ -65,7 +65,7 @@ lan-interface:
     - name: {{ salt.pillar.get('lan:interface') }}
     - enabled: True
     - type: eth
-    - proto: none
+    - proto: static
     - ipaddr: {{ salt.pillar.get('lan:ip') }}
     - netmask: {{ salt.pillar.get('lan:netmask') }}
 
