@@ -8,7 +8,7 @@ install-eap-deps:
 install-eap-proxy:
   pkg.installed:
     - sources:
-      - eap-proxy: salt://router/packages/eap-proxy_0.0.2_all.deb
+      - eap-proxy: salt://router/packages/eap-proxy_0.0.2+2023051801_all.deb
     - require:
       - pkg: install-eap-deps
 

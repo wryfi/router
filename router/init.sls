@@ -9,7 +9,7 @@ include:
 
 backports-repo:
   pkgrepo.managed:
-    - name: deb http://deb.debian.org/debian buster-backports main
+    - name: deb http://deb.debian.org/debian bullseye-backports main
     - file: /etc/apt/sources.list.d/backports.list
 
 router-packages:
@@ -93,3 +93,16 @@ dhclient-config:
   file.managed:
     - name: /etc/dhcp/dhclient.conf
     - source: salt://router/files/etc/dhcp/dhclient.conf
+    - require:
+      - file: dhclient-noresolv-hook
+
+dhclient-noresolv-hook:
+  file.managed:
+    - name: /etc/dhcp/dhclient-enter-hooks.d/noresolv
+    - mode: 0755
+    - contents: |
+        #!/bin/sh
+        make_resolv_conf(){
+	          :
+        }
+
