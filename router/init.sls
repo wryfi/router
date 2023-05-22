@@ -103,6 +103,7 @@ dhclient-noresolv-hook:
     - contents: |
         #!/bin/sh
         make_resolv_conf(){
-	          :
+            :
         }
+
 
