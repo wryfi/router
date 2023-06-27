@@ -9,10 +9,12 @@ router.
 ```
 # wan interface is wired directly to the ONT
 # copy the MAC address from your at&t provided router as 'mac'
+# copy the DUID from your router's dhcp requests (tcpdump/wireshark)
 wan:
   interface: enp1s0
   vlan_interface: enp1s0.0
   mac: '88:77:66:55:44:33'
+  duid: '00:02:00:00 ...'
 
 # shitbox interface is wired to the at&t provided shitbox router
 shitbox:

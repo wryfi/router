@@ -1,3 +1,5 @@
+{% set pihole_ip = salt.pillar.get('lan:ip') %}
+
 remove-unbound:
   pkg.removed:
     - name: unbound
@@ -33,13 +35,12 @@ pihole-container:
       - /opt/pihole/etc/dnsmasq.d:/etc/dnsmasq.d
     - environment:
       - TZ: America/Los_Angeles
-      - ServerIP: 10.9.8.1
+      - ServerIP: {{ pihole_ip }}
     - port_bindings:
-      - 10.9.8.1:53:53/tcp
-      - 10.9.8.1:53:53/udp
-      - 10.9.8.1:80:80/tcp
-      - 10.9.8.1:443:443/tcp
+      - {{ pihole_ip }}:53:53/tcp
+      - {{ pihole_ip }}:53:53/udp
+      - {{ pihole_ip }}:80:80/tcp
+      - {{ pihole_ip }}:443:443/tcp
     - restart_policy: always
     - cap_add:
       - NET_ADMIN
-
