@@ -1,5 +1,3 @@
-{% import_yaml 'router/config.yml' as config %}
-
 install-eap-deps:
   pkg.installed:
     - pkgs:
