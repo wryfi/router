@@ -77,10 +77,10 @@ shorewall-snat:
     - contents: |
         MASQUERADE  $INTERNAL    $WAN_IF
 
-enable-shorewall:
-  cmd.run:
-    - name: sed -i 's/startup=0/startup=1/g' /etc/default/shorewall
-    - unless: grep startup=1 /etc/default/shorewall
+#enable-shorewall:
+#  cmd.run:
+#    - name: sed -i 's/startup=0/startup=1/g' /etc/default/shorewall
+#    - unless: grep startup=1 /etc/default/shorewall
 
 shorewall-service:
   service.running:
