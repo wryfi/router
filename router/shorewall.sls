@@ -83,9 +83,9 @@ shorewall-snat:
 #    - unless: grep startup=1 /etc/default/shorewall
 
 shorewall-service:
-  service.running:
+  service.dead:
     - name: shorewall
-    - enable: true
+    - enable: false
     - watch:
       - file: shorewall-rules
       - file: shorewall-policy
