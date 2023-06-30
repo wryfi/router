@@ -1,15 +1,30 @@
 {% set pihole_ip = salt.pillar.get('lan:ip') %}
 
-remove-unbound:
-  pkg.removed:
+unbound-packages:
+  pkg.latest:
     - name: unbound
+    - pkgs:
+      - unbound
+      - dns-root-data
     - require:
-      - service: unbound-disable
+      - file: unbound-config
 
-unbound-disable:
-  service.dead:
+unbound-config:
+  file.managed:
+    - name: /etc/unbound/unbound.conf.d/local-resolver.conf
+    - source: salt://router/files/etc/unbound/unbound.conf.d/local-resolver.conf
+    - template: jinja
+    - defaults:
+        pihole_ip: {{ pihole_ip }}
+    - require:
+      - pkg: unbound-packages
+
+unbound-service:
+  service.running:
     - name: unbound
-    - enable: false
+    - enable: true
+    - watch:
+      - file: unbound-config
 
 pihole-volume:
   file.directory:
@@ -25,6 +40,14 @@ pihole-network:
   docker_network.present:
     - name: pihole-network
 
+pihole-ftl-config:
+  file.managed:
+    - name: /opt/pihole/etc/pihole/pihole-FTL.conf
+    - source: salt://router/files/etc/pihole/pihole-FTL.conf
+    - template: jinja
+    - defaults:
+        pihole_ip: {{ pihole_ip }}
+
 pihole-container:
   docker_container.running:
     - name: pihole
@@ -36,6 +59,7 @@ pihole-container:
     - environment:
       - TZ: America/Los_Angeles
       - ServerIP: {{ pihole_ip }}
+      - PIHOLE_DNS_: {{ pihole_ip }}#5335
     - port_bindings:
       - {{ pihole_ip }}:53:53/tcp
       - {{ pihole_ip }}:53:53/udp
@@ -44,3 +68,5 @@ pihole-container:
     - restart_policy: always
     - cap_add:
       - NET_ADMIN
+    - watch:
+      - file: pihole-ftl-config

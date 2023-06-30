@@ -1,4 +1,5 @@
 include:
+  - router.ssh
   - router.docker
   - router.resolver
   - router.dyndns
