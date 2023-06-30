@@ -45,6 +45,8 @@ pihole-ftl-config:
     - template: jinja
     - defaults:
         pihole_ip: {{ pihole_ip }}
+    - require:
+      - file: pihole-volume
 
 pihole-container:
   docker_container.running:
