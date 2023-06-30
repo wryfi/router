@@ -6,8 +6,6 @@ unbound-packages:
     - pkgs:
       - unbound
       - dns-root-data
-    - require:
-      - file: unbound-config
 
 unbound-config:
   file.managed:
