@@ -34,6 +34,14 @@ dnsmasq-volume:
     - name: /opt/pihole/etc/dnsmasq.d
     - mode: 0755
 
+root-hints-cron:
+  file.managed:
+    - name: /etc/cron.d/hints
+    - contents: |
+        # this file is managed by salt
+        # update root hints once per day at 03:13
+        13 3 * * *  root  [ -d /etc/unbound ] && /usr/bin/wget -q "https://www.internic.net/domain/named.cache" -O /etc/unbound/root.hints
+
 pihole-network:
   docker_network.present:
     - name: pihole-network

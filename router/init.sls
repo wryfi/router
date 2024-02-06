@@ -21,6 +21,7 @@ router-packages:
     - pkgs:
       - apt-transport-https
       - ca-certificates
+      - cron
       - curl
       - dhcpcd
       - dnsutils
@@ -36,6 +37,7 @@ router-packages:
       - tcpdump
       - vim-nox
       - vlan
+      - wget
     - require:
       - pkgrepo: saltstack-repo
     - refresh: true
