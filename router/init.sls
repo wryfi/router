@@ -11,7 +11,7 @@ include:
 {# TODO: replace hardcoded `bullseye` once salt creates a `bookworm` repo #}
 saltstack-repo:
   pkgrepo.managed:
-    - name: deb [signed-by=/etc/apt/keyrings/salt-archive-keyring-2023.gpg arch=amd64] https://repo.saltproject.io/salt/py3/debian/11/amd64/latest bullseye main
+    - name: deb [signed-by=/etc/apt/keyrings/salt-archive-keyring-2023.gpg arch=amd64] https://repo.saltproject.io/salt/py3/debian/12/amd64/latest bookworm main
     - key_url: https://repo.saltproject.io/salt/py3/debian/11/amd64/SALT-PROJECT-GPG-PUBKEY-2023.gpg
     - aptkey: false
     - file: /etc/apt/sources.list.d/backports.list
