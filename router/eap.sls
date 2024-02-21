@@ -20,8 +20,8 @@ eap-proxy-config:
         IF_ROUTER: {{ salt.pillar.get('shitbox:interface') }}
 
 eap-proxy-service:
-  service.running:
+  service.dead:
     - name: eap-proxy
-    - enable: true
+    - enable: false
     - watch:
       - file: eap-proxy-config

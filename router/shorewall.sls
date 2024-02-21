@@ -13,7 +13,7 @@ shorewall-params:
   file.managed:
     - name: /etc/shorewall/params
     - contents: |
-        WAN_IF={{ salt.pillar.get('wan:vlan_interface') }}
+        WAN_IF={{ salt.pillar.get('wan:interface') }}
         LAN_IF={{ salt.pillar.get('lan:interface') }}
         INTERNAL={{ salt.pillar.get('lan:network') }}/{{ salt.pillar.get('lan:cidr') }}
 

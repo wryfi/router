@@ -8,12 +8,11 @@ include:
   - router.eap
   - router.ntp
 
-{# TODO: replace hardcoded `bullseye` once salt creates a `bookworm` repo #}
 saltstack-repo:
   pkgrepo.managed:
     - name: deb [signed-by=/etc/apt/keyrings/salt-archive-keyring-2023.gpg arch=amd64] https://repo.saltproject.io/salt/py3/debian/12/amd64/latest bookworm main
     - key_url: https://repo.saltproject.io/salt/py3/debian/11/amd64/SALT-PROJECT-GPG-PUBKEY-2023.gpg
-    - aptkey: false
+    - aptkey: False
     - file: /etc/apt/sources.list.d/backports.list
 
 router-packages:
@@ -45,7 +44,7 @@ router-packages:
 salt-minion-service-dead:
   service.dead:
     - name: salt-minion
-    - enable: false
+    - enable: False
 
 salt-minion-config:
   file.managed:
@@ -64,13 +63,12 @@ wan-interface:
     - name: {{ salt.pillar.get('wan:interface') }}
     - enabled: True
     - type: eth
-    - proto: manual
-    - hwaddress: {{ salt.pillar.get('wan:mac') }}
+    - proto: dhcp
 
 wan-vlan-interface:
   network.managed:
     - name: {{ salt.pillar.get('wan:vlan_interface') }}
-    - enabled: true
+    - enabled: False
     - type: vlan
     - proto: dhcp
     - vlan-raw-device: {{ salt.pillar.get('wan:interface') }}
@@ -80,7 +78,7 @@ wan-vlan-interface:
 router-interface:
   network.managed:
     - name: {{ salt.pillar.get('shitbox:interface') }}
-    - enabled: True
+    - enabled: False
     - type: eth
     - proto: manual
 
@@ -118,9 +116,8 @@ dhclient-removed:
         - dhclient
 
 duid-override:
-  file.managed:
+  file.absent:
     - name: /var/lib/dhcpcd/duid
-    - contents_pillar: wan:duid
 
 dhcpcd-config:
   file.managed:
@@ -128,4 +125,4 @@ dhcpcd-config:
     - source: salt://router/files/etc/dhcpcd.conf
     - template: jinja
     - defaults:
-        interface: {{ salt.pillar.get('wan:vlan_interface') }}
+        interface: {{ salt.pillar.get('wan:interface') }}

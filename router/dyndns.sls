@@ -11,7 +11,7 @@ dns-update-script:
         password: {{ salt.pillar.get('secrets:dyndns') }}
         server: {{ salt.pillar.get('dyndns:server') }}
         hostname: {{ salt.grains.get('domain') }}   
-        wan_interface: {{ salt.pillar.get('wan:vlan_interface') }}
+        wan_interface: {{ salt.pillar.get('wan:interface') }}
 
 dns-update-cron:
   file.managed:
