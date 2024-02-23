@@ -5,6 +5,7 @@ include:
   - router.dyndns
   - router.kea
   - router.shorewall
+  - router.firewalld
   - router.eap
   - router.ntp
 
