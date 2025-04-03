@@ -1,0 +1,206 @@
+#!/usr/bin/env python3
+
+import requests
+import subprocess
+import json
+import sys
+import re
+import os
+from typing import Optional, Dict, Any
+
+# Configuration
+CLOUDFLARE_API_TOKEN = "{{ cloudflare_api_token }}"
+ZONE_NAME = "wry.fi"
+RECORD_NAME = "isla.xyz.wry.fi"
+INTERFACE = "enp2s0"
+
+def get_public_ip_from_interface(interface: str) -> Optional[str]:
+    """Get the public IP address from the specified network interface."""
+    try:
+        # Get IP address assigned to the interface
+        ip_output = subprocess.check_output(
+            ["ip", "-4", "addr", "show", interface],
+            universal_newlines=True
+        )
+
+        # Extract IP using regex
+        ip_match = re.search(r'inet\s+(\d+\.\d+\.\d+\.\d+)', ip_output)
+        if ip_match:
+            local_ip = ip_match.group(1)
+
+            # If the IP is private, get the public IP
+            if (
+                local_ip.startswith("10.") or
+                local_ip.startswith("172.16.") or
+                local_ip.startswith("192.168.")
+            ):
+                # Use a service to get public IP
+                response = requests.get("https://api.ipify.org")
+                if response.status_code == 200:
+                    return response.text.strip()
+                else:
+                    print(f"Failed to get public IP: {response.status_code}")
+                    return None
+            else:
+                # If not private, return the interface IP
+                return local_ip
+        else:
+            print(f"No IPv4 address found for interface {interface}")
+            return None
+    except subprocess.CalledProcessError as e:
+        print(f"Error running 'ip' command: {e}")
+        return None
+    except Exception as e:
+        print(f"Error getting IP address: {e}")
+        return None
+
+def get_zone_id(api_token: str, zone_name: str) -> Optional[str]:
+    """Get the zone ID for the specified domain."""
+    headers = {
+        "Authorization": f"Bearer {api_token}",
+        "Content-Type": "application/json",
+    }
+
+    response = requests.get(
+        "https://api.cloudflare.com/client/v4/zones",
+        headers=headers
+    )
+
+    if response.status_code != 200:
+        print(f"Error fetching zones: {response.status_code}, {response.text}")
+        return None
+
+    zones = response.json().get("result", [])
+    for zone in zones:
+        if zone["name"] == zone_name:
+            return zone["id"]
+
+    print(f"Zone '{zone_name}' not found")
+    return None
+
+def get_dns_record(api_token: str, zone_id: str, record_name: str) -> Optional[Dict[str, Any]]:
+    """Get the DNS record for the specified name."""
+    headers = {
+        "Authorization": f"Bearer {api_token}",
+        "Content-Type": "application/json",
+    }
+
+    response = requests.get(
+        f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records",
+        params={"name": record_name},
+        headers=headers
+    )
+
+    if response.status_code != 200:
+        print(f"Error fetching DNS records: {response.status_code}, {response.text}")
+        return None
+
+    records = response.json().get("result", [])
+    for record in records:
+        if record["name"] == record_name:
+            return record
+
+    return None
+
+def update_dns_record(api_token: str, zone_id: str, record_id: str, record_name: str, ip_address: str) -> bool:
+    """Update the DNS record with the new IP address."""
+    headers = {
+        "Authorization": f"Bearer {api_token}",
+        "Content-Type": "application/json",
+    }
+
+    data = {
+        "type": "A",
+        "name": record_name,
+        "content": ip_address,
+        "ttl": 1,  # Auto
+        "proxied": False
+    }
+
+    response = requests.put(
+        f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records/{record_id}",
+        headers=headers,
+        json=data
+    )
+
+    if response.status_code != 200:
+        print(f"Error updating DNS record: {response.status_code}, {response.text}")
+        return False
+
+    result = response.json()
+    return result.get("success", False)
+
+def create_dns_record(api_token: str, zone_id: str, record_name: str, ip_address: str) -> bool:
+    """Create a new DNS record."""
+    headers = {
+        "Authorization": f"Bearer {api_token}",
+        "Content-Type": "application/json",
+    }
+
+    data = {
+        "type": "A",
+        "name": record_name,
+        "content": ip_address,
+        "ttl": 1,  # Auto
+        "proxied": False
+    }
+
+    response = requests.post(
+        f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records",
+        headers=headers,
+        json=data
+    )
+
+    if response.status_code != 200:
+        print(f"Error creating DNS record: {response.status_code}, {response.text}")
+        return False
+
+    result = response.json()
+    return result.get("success", False)
+
+def main():
+    if not CLOUDFLARE_API_TOKEN:
+        print("Error: CLOUDFLARE_API_TOKEN environment variable not set")
+        print("Run with: CLOUDFLARE_API_TOKEN=your_token ./update_dns.py")
+        sys.exit(1)
+
+    # Get IP address
+    ip_address = get_public_ip_from_interface(INTERFACE)
+    if not ip_address:
+        print(f"Failed to get IP address from interface {INTERFACE}")
+        sys.exit(1)
+
+    print(f"Current public IP address: {ip_address}")
+
+    # Get zone ID
+    zone_id = get_zone_id(CLOUDFLARE_API_TOKEN, ZONE_NAME)
+    if not zone_id:
+        sys.exit(1)
+
+    # Get existing record
+    record = get_dns_record(CLOUDFLARE_API_TOKEN, zone_id, RECORD_NAME)
+
+    if record:
+        # Update existing record
+        record_id = record["id"]
+        current_ip = record["content"]
+
+        if current_ip == ip_address:
+            print(f"IP address already up to date ({ip_address})")
+            return
+
+        print(f"Updating DNS record from {current_ip} to {ip_address}")
+        if update_dns_record(CLOUDFLARE_API_TOKEN, zone_id, record_id, RECORD_NAME, ip_address):
+            print(f"Successfully updated DNS record for {RECORD_NAME}")
+        else:
+            print(f"Failed to update DNS record for {RECORD_NAME}")
+    else:
+        # Create new record
+        print(f"Creating new DNS record for {RECORD_NAME} with IP {ip_address}")
+        if create_dns_record(CLOUDFLARE_API_TOKEN, zone_id, RECORD_NAME, ip_address):
+            print(f"Successfully created DNS record for {RECORD_NAME}")
+        else:
+            print(f"Failed to create DNS record for {RECORD_NAME}")
+
+if __name__ == "__main__":
+    main()

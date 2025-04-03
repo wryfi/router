@@ -32,6 +32,7 @@ router-packages:
       - iftop
       - lsof
       - python3-docker
+      - python3-requests
       - salt-minion
       - software-properties-common
       - tcpdump
