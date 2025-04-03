@@ -16,7 +16,7 @@ dns-update-script:
 cloudflare-dns-update:
   file.managed:
     - name: /usr/local/bin/update_dns_cloudflare
-    - source: salt://router/files/usr/local/gin/update_dns_cloudflare
+    - source: salt://router/files/usr/local/bin/update_dns_cloudflare
     - mode: 0750
     - template: jinja
     - defaults:
