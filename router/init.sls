@@ -99,7 +99,7 @@ untrusted-iot-interface:
     - enabled: true
     - type: vlan
     - proto: static
-    - vlan-raw-device {{ salt.pillar.get("lan:interface") }}
+    - vlan-raw-device: {{ salt.pillar.get("lan:interface") }}
     - ipaddr: {{ salt.pillar.get("untrusted_iot:ip") }}
     - netmask: {{ salt.pillar.get("untrusted_iot:netmask") }}
     - require:
