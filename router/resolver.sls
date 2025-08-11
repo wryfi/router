@@ -27,7 +27,7 @@ unbound-service:
 pihole-volume:
   file.directory:
     - name: /opt/pihole/etc/pihole
-    - mode: 0755
+    - mode: 0775
 
 dnsmasq-volume:
   file.directory:
