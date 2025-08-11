@@ -1,5 +1,5 @@
 {% set unifi_gid = 999 %}
-{% set controller_version = "7.4.162" %}
+{% set controller_version = "v7.4" %}
 
 unifi_data_dir:
   file.directory:
