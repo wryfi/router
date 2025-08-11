@@ -60,9 +60,9 @@ configure_untrusted_zone:
       - {{ salt.pillar.get("untrusted_iot:interface") }}
     - masquerade: True
     - rich_rules:
-      - 'rule family="ipv4" destination address="192.168.20.1" port port="53" protocol="tcp" accept'
-      - 'rule family="ipv4" destination address="192.168.20.1" port port="53" protocol="udp" accept'
-      - 'rule family="ipv4" destination address="192.168.20.1" port port="67" protocol="udp" accept'
+      - 'rule family="ipv4" destination address="10.6.66.1" port port="53" protocol="tcp" accept'
+      - 'rule family="ipv4" destination address="10.6.66.1" port port="53" protocol="udp" accept'
+      - 'rule family="ipv4" destination address="10.6.66.1" port port="67" protocol="udp" accept'
       - 'rule family="ipv4" destination address="10.0.0.0/8" reject'
       - 'rule family="ipv4" destination address="192.168.0.0/16" reject'
       - 'rule family="ipv4" destination address="172.16.0.0/12" reject'
