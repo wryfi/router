@@ -42,7 +42,7 @@ zone-internal:
 
 zone-untrusted-iot:
   firewalld.present:
-    - name: untrusted_iot
+    - name: untrusted
     - default: false
     - interfaces:
       - {{ salt.pillar.get("untrusted_iot") }}
