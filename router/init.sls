@@ -8,6 +8,7 @@ include:
   - router.firewalld
   - router.eap
   - router.ntp
+  - router.ubiquiti
 
 saltstack-repo:
   pkgrepo.managed:
