@@ -1,5 +1,6 @@
 {% set unifi_gid = 999 %}
 {% set controller_version = "v7.4" %}
+{% set listen = salt.pillar.get("lan:ip") %}
 
 unifi_data_dir:
   file.directory:
@@ -22,17 +23,20 @@ unifi_container:
     - restart_policy: unless-stopped
     - port_bindings:
         "8080/tcp":
-          - HostIp: "{{ salt.pillar.get("lan:ip") }}"
+          - HostIp: "{{ listen }}"
             HostPort: "8080"
         "8443/tcp":
-          - HostIp: "{{ salt.pillar.get("lan:ip") }}"
+          - HostIp: "{{ listen }}"
             HostPort: "8443"
         "3478/udp":
-          - HostPort: "3478"
+          - HostIp: "{{ listen }}"
+            HostPort: "3478"
         "10001/udp":
-          - HostPort: "10001"
+          - HostIp: "{{ listen }}"
+            HostPort: "10001"
         "1900/udp":
-          - HostPort: "1{{ unifi_gid }}"
+          - HostIp: "{{ listen }}"
+            HostPort: "1900"
     - environment:
       - TZ=America/Los_Angeles
       - JVM_MAX_HEAP_SIZE=1024M

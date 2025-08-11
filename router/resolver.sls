@@ -1,4 +1,5 @@
 {% set pihole_ip = salt.pillar.get('lan:ip') %}
+{% set iot_ip = salt.pillar.get("untrusted_iot:ip") %}
 
 unbound-packages:
   pkg.latest:
@@ -73,6 +74,10 @@ pihole-container:
       - {{ pihole_ip }}:53:53/udp
       - {{ pihole_ip }}:80:80/tcp
       - {{ pihole_ip }}:443:443/tcp
+      - {{ iot_ip }}:53:53/tcp
+      - {{ iot_ip }}:53:53/udp
+      - {{ iot_ip }}:80:80/tcp
+      - {{ iot_ip }}:443:443/tcp
     - restart_policy: always
     - cap_add:
       - NET_ADMIN
