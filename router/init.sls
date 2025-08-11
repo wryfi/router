@@ -93,6 +93,18 @@ lan-interface:
     - ipaddr: {{ salt.pillar.get('lan:ip') }}
     - netmask: {{ salt.pillar.get('lan:netmask') }}
 
+untrusted-iot-interface:
+  network.managed:
+    - name: {{ salt.pillar.get("untrusted_iot:interface") }}
+    - enabled: true
+    - type: vlan
+    - proto: static
+    - vlan-raw-device {{ salt.pillar.get("lan:interface") }}
+    - ipaddr: {{ salt.pillar.get("untrusted_iot:ip") }}
+    - netmask: {{ salt.pillar.get("untrusted_iot:netmask") }}
+    - require:
+      - network: lan-interface
+
 vm-swappiness:
   sysctl.present:
     - name: vm.swappiness

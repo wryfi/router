@@ -39,3 +39,14 @@ zone-internal:
         - http3
         - https
         - ssh-high
+
+zone-untrusted-iot:
+  firewalld.present:
+    - name: untrusted-iot
+    - default: false
+    - interfaces:
+      - {{ salt.pillar.get("untrusted_iot") }}
+    - masquerade: true
+    - services:
+      - dhcp
+      - dns
