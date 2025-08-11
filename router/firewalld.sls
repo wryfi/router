@@ -57,7 +57,7 @@ configure_untrusted_zone:
   firewalld.present:
     - name: untrusted-iot
     - interfaces:
-      - {{ salt.pillar.get("untrusted_vlan:interface") }}
+      - {{ salt.pillar.get("untrusted_iot:interface") }}
     - masquerade: True
     - rich_rules:
       - 'rule family="ipv4" destination address="192.168.20.1" port port="53" protocol="tcp" accept'
