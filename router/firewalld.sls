@@ -66,7 +66,5 @@ configure_untrusted_zone:
       - 'rule family="ipv4" destination address="10.0.0.0/8" reject'
       - 'rule family="ipv4" destination address="192.168.0.0/16" reject'
       - 'rule family="ipv4" destination address="172.16.0.0/12" reject'
-    - permanent: True
-    - immediate: True
     - require:
       - cmd: reload_firewalld_after_zone_creation
