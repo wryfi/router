@@ -1,4 +1,4 @@
-{% set unifi_gid = 900 %}
+{% set unifi_gid = 999 %}
 
 unifi_data_dir:
   file.directory:
