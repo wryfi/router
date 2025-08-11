@@ -62,7 +62,7 @@ configure_untrusted_zone:
       - dns
       - dhcp
     - masquerade: True
-    - rich_rules
+    - rich_rules:
       - 'rule family="ipv4" destination address="10.0.0.0/8" reject'
       - 'rule family="ipv4" destination address="192.168.0.0/16" reject'
       - 'rule family="ipv4" destination address="172.16.0.0/12" reject'
