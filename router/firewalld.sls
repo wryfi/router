@@ -40,13 +40,33 @@ zone-internal:
         - https
         - ssh-high
 
-zone-untrusted-iot:
+create_untrusted_zone:
+  cmd.run:
+    - name: firewall-cmd --permanent --new-zone=untrusted-iot
+    - unless: firewall-cmd --get-zones | grep -q untrusted-iot
+
+# Reload firewalld after creating zone
+reload_firewalld_after_zone_creation:
+  cmd.run:
+    - name: firewall-cmd --reload
+    - onchanges:
+      - cmd: create_untrusted_zone
+
+# Configure untrusted zone
+configure_untrusted_zone:
   firewalld.present:
-    - name: untrusted
-    - default: false
+    - name: untrusted-iot
     - interfaces:
-      - {{ salt.pillar.get("untrusted_iot") }}
-    - masquerade: true
+      - {{ salt.pillar.get("untrusted_vlan:interface") }}
     - services:
-      - dhcp
       - dns
+      - dhcp
+    - masquerade: True
+    - rich_rules
+      - 'rule family="ipv4" destination address="10.0.0.0/8" reject'
+      - 'rule family="ipv4" destination address="192.168.0.0/16" reject'
+      - 'rule family="ipv4" destination address="172.16.0.0/12" reject'
+    - permanent: True
+    - immediate: True
+    - require:
+      - cmd: reload_firewalld_after_zone_creation

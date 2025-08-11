@@ -12,8 +12,6 @@ unifi_data_dir:
 unifi_docker_image:
   docker_image.present:
     - name: jacobalberty/unifi:latest
-    - require:
-      - service: docker_service
 
 # Create and run UniFi container
 unifi_container:
