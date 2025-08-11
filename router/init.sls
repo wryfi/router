@@ -40,8 +40,6 @@ router-packages:
       - vim-nox
       - vlan
       - wget
-    - require:
-      - pkgrepo: saltstack-repo
     - refresh: true
 
 salt-minion-service-dead:
