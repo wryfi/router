@@ -1,4 +1,5 @@
 {% set unifi_gid = 999 %}
+{% set controller_version = "7.4.162" %}
 
 unifi_data_dir:
   file.directory:
@@ -11,13 +12,13 @@ unifi_data_dir:
 # Pull UniFi Docker image
 unifi_docker_image:
   docker_image.present:
-    - name: jacobalberty/unifi:latest
+    - name: jacobalberty/unifi:{{ controller_version }}
 
 # Create and run UniFi container
 unifi_container:
   docker_container.running:
     - name: unifi-controller
-    - image: jacobalberty/unifi:latest
+    - image: jacobalberty/unifi:{{ controller_version }}
     - restart_policy: unless-stopped
     - port_bindings:
         "8080/tcp":
