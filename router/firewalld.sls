@@ -16,6 +16,7 @@ zone-external:
     - interfaces:
         - {{ salt.pillar.get('wan:interface') }}
     - masquerade: True
+    - forward: True
     - block_icmp:
         - echo-reply
         - echo-request
@@ -59,6 +60,7 @@ configure_untrusted_zone:
     - interfaces:
       - {{ salt.pillar.get("untrusted_iot:interface") }}
     - masquerade: True
+    - forward: True
     - rich_rules:
       - 'rule family="ipv4" destination address="10.6.66.1" port port="53" protocol="tcp" accept'
       - 'rule family="ipv4" destination address="10.6.66.1" port port="53" protocol="udp" accept'
